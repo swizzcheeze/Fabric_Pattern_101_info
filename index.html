@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabric Patterns Documentation - Enhanced Readability</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/a11y-dark.min.css">  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <style>
+        :root {
+            /* --- Enhanced Readability & Contrast Colors --- */
+            --primary-color: #005EB8;  /* Darker Blue for better contrast */
+            --secondary-color: #D9531E; /* Slightly Darker Orange */
+            --text-color: #1D2129;     /* Dark Grey for Body Text */
+            --text-light: #5A6978;    /* Darker Grey for Meta/Subtle Text */
+            --bg-color: #E9EBEE;      /* Slightly adjusted Background Gray */
+            --card-bg: #FFFFFF;       /* Card White */
+            --code-bg: #F0F2F5;       /* Slightly Darker Code/Tag Background */
+            --border-color: #D1D5DA;   /* More visible Border Color */
+            --upvote-color: var(--secondary-color); /* Use secondary color */
+            --downvote-color: #4A90E2; /* A distinct but less intense blue */
+            --header-bg: #1D2129;      /* Dark Header Background */
+            --header-text: #F5F6F7;    /* Light Header Text */
+            --link-color: var(--primary-color); /* Use primary color for links */
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Verdana', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            font-size: 15px; /* Increased base font size */
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+        }
+        header {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 10px 20px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 101;
+            border-bottom: 2px solid var(--secondary-color); /* Make border more prominent */
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            color: var(--header-text);
+            display: inline-block;
+        }
+        header p {
+           display: none;
+        }
+        nav {
+            background-color: var(--card-bg);
+            padding: 8px 20px;
+            position: sticky;
+            top: 59px; /* Adjusted for thicker header border */
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+        }
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        nav li {
+            margin-right: 15px;
+            margin-bottom: 5px;
+        }
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+            font-size: 0.9em;
+        }
+        nav a:hover, nav a:focus { /* Added focus style */
+            color: var(--secondary-color);
+            text-decoration: underline; /* Add underline on hover/focus */
+        }
+        .markdown-body {
+            padding: 0;
+            font-size: 1em;
+        }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.3em;
+            margin-top: 1.5em;
+        }
+        .markdown-body h2 {
+            font-size: 1.5em;
+        }
+        .markdown-body h3 {
+            font-size: 1.2em;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            border-bottom: none;
+        }
+         /* Inline code styling */
+        .markdown-body code:not([class*="language-"]) {
+            background-color: var(--code-bg);
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+            color: #B71540; /* Distinct color for inline code */
+            border: 1px solid var(--border-color); /* Subtle border */
+        }
+         /* Code block styling */
+        .markdown-body pre {
+            background-color: #282C34; /* Darker background for code blocks */
+            border-radius: 4px;
+            padding: 16px;
+            overflow: auto;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        .markdown-body pre code {
+           background-color: transparent;
+           padding: 0;
+           font-size: 0.9em;
+           color: #ABB2BF; /* Light text for dark code blocks */
+        }
+         /* Pattern Card Styling */
+        .pattern-card {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin: 10px 0;
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: border-color 0.2s ease;
+            display: flex;
+            padding: 0;
+        }
+        .pattern-card:hover {
+            border-color: #8A94A1; /* Darker border on hover */
+        }
+        .voting {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 4px 8px 8px;
+            background-color: #F8F9FA; /* Kept light, distinct from card */
+            border-right: 1px solid var(--border-color);
+        }
+        .upvote, .downvote {
+            width: 24px;
+            height: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin: 2px 0;
+            font-size: 1.3rem;
+            color: #8A94A1; /* Neutral grey arrows */
+            line-height: 1;
+            padding: 0;
+            transition: background-color 0.2s, color 0.2s; /* Added transition */
+        }
+        .upvote:hover, .upvote:focus { /* Added focus */
+            color: var(--upvote-color);
+            background-color: rgba(217, 83, 30, 0.1); /* Light orange bg */
+        }
+        .downvote:hover, .downvote:focus { /* Added focus */
+            color: var(--downvote-color);
+            background-color: rgba(74, 144, 226, 0.1); /* Light blue bg */
+        }
+        .vote-count {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin: 4px 0;
+            color: var(--text-color);
+        }
+        .pattern-main {
+            padding: 12px 15px; /* Slightly more padding */
+            flex-grow: 1;
+        }
+        .pattern-main h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: var(--link-color);
+            font-size: 1.15em; /* Slightly larger title */
+            cursor: pointer;
+            border-bottom: none;
+        }
+         .pattern-main h3:hover, .pattern-main h3:focus {
+            text-decoration: underline;
+        }
+        .pattern-meta {
+            display: flex;
+            margin-bottom: 10px; /* More space below meta */
+            flex-wrap: wrap;
+        }
+         /* Meta Tags (Bubbles) */
+        .pattern-meta div {
+            background-color: var(--code-bg);
+            padding: 4px 10px; /* Slightly larger padding */
+            border-radius: 4px; /* Less rounded */
+            margin-right: 6px;
+            margin-bottom: 6px; /* More space between tags */
+            font-size: 0.85em; /* Slightly larger meta font */
+            color: var(--text-light); /* Use the darker text-light */
+            border: 1px solid var(--border-color);
+            line-height: 1.4; /* Ensure text fits well */
+        }
+        .pattern-main p {
+            margin-bottom: 10px; /* More space below paragraphs */
+            font-size: 1em; /* Ensure description is base size */
+            color: var(--text-color); /* Ensure standard text color */
+        }
+        .pattern-main p strong {
+            color: #000000; /* Make strong text black for emphasis */
+            font-weight: 600;
+        }
+        .copy-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #4A4A4A; /* Dark grey button */
+            color: white;
+            border: 1px solid #333;
+            border-radius: 3px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 0.8em;
+            opacity: 0.8;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+        .copy-button:hover, .copy-button:focus { /* Added focus */
+            background-color: #333;
+            opacity: 1;
+        }
+         .copy-button.copied {
+            background-color: #28A745; /* Green when copied */
+            border-color: #1E7E34;
+         }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+        footer a {
+            color: #A5D8FF; /* Lighter blue for links in dark footer */
+            text-decoration: underline;
+        }
+        footer a:hover, footer a:focus {
+             color: #FFFFFF;
+        }
+        .github-corner {
+            position: absolute;
+            top: 0;
+            right: 0;
+            border: 0;
+            fill: var(--secondary-color);
+            color: var(--header-bg);
+        }
+        .pattern-section {
+            margin-bottom: 30px;
+        }
+        .category-section {
+            background-color: var(--card-bg);
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+        .category-section h2 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            font-size: 1.4em; /* Larger category titles */
+        }
+         .category-section h3 {
+             font-size: 1.2em; /* Larger sub-category titles */
+             margin-top: 1.5em;
+             margin-bottom: 1em;
+             border-bottom: none;
+             padding-bottom: 0;
+             color: var(--text-color);
+         }
+        .category-content {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+         /* General Tags (like in What is Fabric) */
+        .tag {
+            display: inline-block;
+            background-color: var(--code-bg);
+            padding: 5px 12px; /* Larger tags */
+            border-radius: 4px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            color: var(--text-light); /* Darker text */
+            cursor: default; /* Indicate non-interactive */
+            transition: background-color 0.2s;
+            border: 1px solid var(--border-color);
+        }
+        /* No hover effect needed for these static tags */
+        /* .tag:hover {
+            background-color: var(--border-color);
+            color: var(--text-color);
+        } */
+        .sticky-toc {
+            position: sticky;
+            top: 115px;
+            background-color: var(--card-bg);
+            border-radius: 4px;
+            padding: 15px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+        .sticky-toc h3 {
+            margin-top: 0;
+            font-size: 1.1em;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        .sticky-toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+         .sticky-toc > ul > li {
+             padding: 4px 0;
+             font-weight: 600;
+         }
+         .sticky-toc ul ul {
+             padding-left: 15px;
+             margin-top: 4px;
+             margin-bottom: 8px;
+         }
+        .sticky-toc li {
+            padding: 2px 0;
+        }
+        .sticky-toc a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.95em; /* Slightly larger TOC font */
+            display: block;
+            padding: 5px 8px; /* More clickable area */
+            border-radius: 3px;
+            transition: background-color 0.2s, padding-left 0.2s, color 0.2s;
+            font-weight: normal;
+            outline: none; /* Remove default outline */
+        }
+        .sticky-toc a:hover {
+            background-color: var(--code-bg);
+            padding-left: 12px;
+            color: var(--primary-color);
+            text-decoration: none; /* Ensure no underline unless active */
+        }
+         /* Style for focused TOC links */
+         .sticky-toc a:focus {
+             box-shadow: 0 0 0 2px var(--primary-color); /* Focus ring */
+             background-color: var(--code-bg);
+         }
+
+        .sticky-toc .active {
+            color: var(--secondary-color);
+            font-weight: 600;
+            background-color: rgba(217, 83, 30, 0.1); /* Light orange bg */
+            border-left: 3px solid var(--secondary-color);
+            padding-left: 5px;
+        }
+         .sticky-toc .active:focus { /* Focus style for active link */
+             box-shadow: 0 0 0 2px var(--secondary-color); /* Orange focus ring */
+         }
+
+         .page-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+        }
+        .main-content {
+            grid-column: 2;
+            min-width: 0;
+        }
+        .sidebar {
+            grid-column: 1;
+        }
+        .toggle-example {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px; /* Less rounded */
+            padding: 4px 12px; /* Adjusted padding */
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 0.85em; /* Adjusted size */
+            font-weight: 600;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .toggle-example:hover, .toggle-example:focus {
+            background-color: var(--primary-color);
+            color: white;
+            outline: none; /* Remove default focus */
+        }
+         .toggle-example.expanded {
+             background-color: var(--primary-color);
+             color: white;
+         }
+         .toggle-example:focus { /* Add distinct focus style */
+             box-shadow: 0 0 0 2px var(--primary-color);
+         }
+        .example-content {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .example-content.show-example {
+            display: block;
+        }
+        .example-content h4 {
+            font-size: 0.95em; /* Slightly larger example heading */
+            color: var(--text-light); /* Darker grey */
+            margin-bottom: 8px; /* More space */
+            margin-top: 0;
+        }
+        /* Highlight.js dark theme override for contrast */
+        .hljs {
+            background: #282C34 !important;
+            color: #ABB2BF !important;
+        }
+        .hljs-keyword { color: #C678DD !important; }
+        .hljs-string { color: #98C379 !important; }
+        .hljs-comment { color: #5C6370 !important; }
+        .hljs-number { color: #D19A66 !important; }
+        .hljs-built_in { color: #E6C07B !important; }
+        .hljs-variable { color: #E06C75 !important; }
+
+
+        @media (max-width: 900px) {
+             .page-layout {
+                grid-template-columns: 1fr;
+            }
+            .main-content, .sidebar {
+                grid-column: 1;
+            }
+            .sticky-toc {
+                position: static;
+                max-height: none;
+                margin-bottom: 20px;
+                width: auto;
+            }
+             header h1 {
+                 font-size: 1.5em;
+             }
+             nav {
+                 top: 50px;
+             }
+        }
+        @media (max-width: 768px) {
+            body { font-size: 14px; } /* Slightly smaller on mobile */
+            .container {
+                padding: 10px;
+            }
+            header {
+                padding: 8px 10px;
+                 position: static;
+            }
+             nav {
+                 position: static;
+                 padding: 5px 10px;
+             }
+             nav ul { }
+            .github-corner {
+                display: none;
+            }
+            .page-layout {
+                grid-template-columns: 1fr; /* Ensure single column */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fabric Pattern 101 info</h1>
+        <a href="https://github.com/swizzcheeze/Fabric_Pattern_101_info" class="github-corner" aria-label="View on GitHub">
+            <svg width="60" height="60" viewBox="0 0 250 250" style="position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">
+                <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+                <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+                <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+            </svg>
+        </a>
+    </header>
+
+    <nav>
+        <ul>
+             <li><a href="#what-is-fabric">What is Fabric?</a></li>
+            <li><a href="#writing-patterns">Writing</a></li>
+            <li><a href="#analysis-patterns">Analysis</a></li>
+            <li><a href="#summarization-patterns">Summarization</a></li>
+             <li><a href="#extraction-patterns">Extraction</a></li>
+             <li><a href="#creation-patterns">Creation</a></li>
+             <li><a href="#code-patterns">Code</a></li>
+             <li><a href="#specialized-patterns">Specialized</a></li>
+            <li><a href="#contributing">Contributing</a></li>
+            <li><a href="#resources">Resources</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-layout">
+            <div class="sidebar">
+                <div class="sticky-toc">
+                    <h3>Contents</h3>
+                    <ul>
+                        <li><a href="#what-is-fabric">What is Fabric</a></li>
+                        <li><a href="#writing-patterns">Writing Patterns</a>
+                            <ul>
+                                <li><a href="#write_essay">write_essay</a></li>
+                                <li><a href="#write_micro_essay">write_micro_essay</a></li>
+                                <li><a href="#write_pull-request">write_pull-request</a></li>
+                                <li><a href="#write_nuclei_template_rule">write_nuclei_template_rule</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#pattern-categories">Pattern Categories</a>
+                             <ul>
+                                 <li><a href="#analysis-patterns">Analysis</a>
+                                     </li>
+                                 <li><a href="#summarization-patterns">Summarization</a></li>
+                                 <li><a href="#extraction-patterns">Extraction</a></li>
+                                 <li><a href="#creation-patterns">Creation</a></li>
+                                 <li><a href="#code-patterns">Code</a></li>
+                                 <li><a href="#specialized-patterns">Specialized</a></li>
+                             </ul>
+                        </li>
+                        <li><a href="#pattern-combinations">Pattern Combinations</a></li>
+                        <li><a href="#contributing">Contributing</a></li>
+                        <li><a href="#resources">Resources</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <article class="markdown-body">
+
+                    <div class="category-section" id="what-is-fabric">
+                        <h2>What is Fabric?</h2>
+                        <p>Fabric is an AI-based tool created by Daniel Miessler that provides a library of "patterns" - specialized templates for processing different types of information using AI models...</p>
+                        <h3>Key Features</h3>
+                         <div class="category-content">
+                             <span class="tag">200+ Specialized Patterns</span>
+                             <span class="tag">Multiple AI Model Support</span>
+                             <span class="tag">Consistent Output Formats</span>
+                             <span class="tag">Command-Line Interface</span>
+                             <span class="tag">Extensible Design</span>
+                         </div>
+                          <h3>How Fabric Works</h3>
+                          <p>Fabric works by combining your input data (like text, code, or URLs) with a pre-defined 'pattern' (a specialized system prompt). This combined information is then sent to an AI model (like GPT-4, Claude 3, etc.) to generate a structured output based on the pattern's instructions.</p>
+                          <h3>Installation and Setup</h3>
+                          <pre><code class="language-bash"># Clone the repository
+git clone https://github.com/danielmiessler/fabric.git
+
+# Navigate to the directory
+cd fabric
+
+# Install dependencies (usually involves pip)
+pip install -r requirements.txt
+
+# Set up your API keys (follow README instructions)
+# Example: export OPENAI_API_KEY='your_key_here'
+
+# Run Fabric
+fabric --list # List available patterns
+fabric -p summarize -d "Your text here" # Use a pattern</code><button class="copy-button" title="Copy Code">Copy</button></pre>
+                         <p>For more detailed installation instructions, visit the <a href="https://github.com/danielmiessler/fabric">official Fabric repository</a>.</p>
+                    </div>
+
+                     <div class="pattern-section" id="writing-patterns">
+                        <h2>Writing Patterns</h2>
+                        <p>Patterns designed specifically for content creation and writing tasks, often mimicking specific styles or formats.</p>
+
+                        <div class="pattern-card" id="write_essay">
+                            <div class="voting">
+                                <button class="upvote" title="Upvote">▲</button>
+                                <span class="vote-count">124</span>
+                                <button class="downvote" title="Downvote">▼</button>
+                            </div>
+                            <div class="pattern-main">
+                                <h3>write_essay</h3>
+                                <div class="pattern-meta">
+                                    <div>Content Creation</div>
+                                    <div>Essay Writing</div>
+                                    <div>Paul Graham Style</div>
+                                </div>
+                                <p><strong>Purpose:</strong> Writes concise, clear essays in the style of Paul Graham.</p>
+                                <p>This pattern generates essays focused on simplicity, clarity, and illuminating insights, similar to the influential essays by Paul Graham on startups, technology, and thinking.</p>
+                                <button class="toggle-example" data-target="essay-example">Show Example ▼</button>
+                                <div id="essay-example" class="example-content">
+                                    <h4>Example Command:</h4>
+                                     <pre><code class="language-bash">fabric -p write_essay -d "The impact of AI on knowledge work jobs"</code><button class="copy-button" title="Copy Code">Copy</button></pre>
+                                    <h4>Example Output:</h4>
+                                    <pre><code class="language-markdown"># The Impact of AI on Knowledge Work Jobs
+
+Artificial intelligence is rapidly reshaping the landscape of knowledge work. Tasks once considered uniquely human—analysis, creativity, complex problem-solving—are increasingly within the capabilities of AI systems. This transition isn't merely about automation; it's about augmentation and transformation...
+...</code><button class="copy-button" title="Copy Code">Copy</button></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pattern-card" id="write_micro_essay">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button><span class="vote-count">98</span><button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>write_micro_essay</h3>
+                                <div class="pattern-meta"> <div>Content Creation</div> <div>Concise Writing</div> <div>Blog Post</div> </div>
+                                <p><strong>Purpose:</strong> Writes very concise, clear, and illuminating short essays or posts.</p>
+                                <p>Focuses on delivering a single core idea or insight effectively in a minimal amount of text, suitable for blog snippets or social media.</p>
+                                <button class="toggle-example" data-target="micro-essay-example">Show Example ▼</button>
+                                <div id="micro-essay-example" class="example-content">
+                                     <h4>Example Command:</h4>
+                                      <pre><code class="language-bash">fabric -p write_micro_essay -d "The importance of focused work in a distracted world"</code><button class="copy-button" title="Copy Code">Copy</button></pre>
+                                     <h4>Example Output:</h4>
+                                     <pre><code class="language-markdown">Focus is the superpower of the modern age. In a world saturated with notifications and stimuli, the ability to concentrate deeply on a single task is increasingly rare—and valuable. True progress, whether creative or analytical, demands uninterrupted attention. Cultivating focus isn't just about productivity; it's about reclaiming control over your cognitive resources.</code><button class="copy-button" title="Copy Code">Copy</button></pre>
+                                 </div>
+                             </div>
+                        </div>
+
+                         <div class="pattern-card" id="write_pull-request">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button><span class="vote-count">77</span><button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>write_pull-request</h3>
+                                 <div class="pattern-meta"><div>Technical Writing</div><div>Code Documentation</div><div>Git</div></div>
+                                <p><strong>Purpose:</strong> Drafts detailed pull request descriptions based on git diff input.</p>
+                                <p>Analyzes code changes (diff) and generates a structured PR description, including title, summary, changes, and testing notes.</p>
+                                 <button class="toggle-example" data-target="pr-example">Show Example ▼</button>
+                                 <div id="pr-example" class="example-content">
+                                     <h4>Example Input (Git Diff passed via stdin):</h4>
+                                     <pre><code class="language-bash">git diff HEAD~1 | fabric -p write_pull-request</code><button class="copy-button" title="Copy Code">Copy</button></pre>
+                                      <h4>Example Output:</h4>
+                                      <pre><code class="language-markdown">## PR Title: Refactor Authentication Logic
+
+**Summary:**
+This PR refactors the user authentication module to improve security and maintainability. It replaces the legacy token generation with JWT and centralizes validation logic.
+
+**Changes:**
+- Introduced `JwtService` for token creation and validation.
+- Updated `AuthService` to use `JwtService`.
+- Removed old `TokenUtil` class.
+- Added unit tests for `JwtService`.
+
+**Testing:**
+- Verified login and token refresh flows.
+- All existing authentication tests pass.
+- Ran unit tests for the new service.</code><button class="copy-button" title="Copy Code">Copy</button></pre>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <div class="pattern-card" id="write_nuclei_template_rule">
+                             <div class="voting">
+                                 <button class="upvote" title="Upvote">▲</button>
+                                 <span class="vote-count">28</span>
+                                 <button class="downvote" title="Downvote">▼</button>
+                             </div>
+                             <div class="pattern-main">
+                                <h3>write_nuclei_template_rule</h3>
+                                <div class="pattern-meta"><div>Security</div><div>Vulnerability Scanning</div><div>YAML</div></div>
+                                <p><strong>Purpose:</strong> Generates Nuclei YAML templates for detecting vulnerabilities or specific web patterns.</p>
+                                <p>Takes a description of a vulnerability or desired check and outputs a valid Nuclei template file.</p>
+                                <button class="toggle-example" data-target="nuclei-example">Show Example ▼</button>
+                                <div id="nuclei-example" class="example-content">
+                                    <h4>Example Command:</h4>
+                                    <pre><code class="language-bash">fabric -p write_nuclei_template_rule -d "Create a Nuclei template to detect exposed .git folders"</code><button class="copy-button" title="Copy Code">Copy</button></pre>
+                                    <h4>Example Output:</h4>
+                                    <pre><code class="language-yaml">id: exposed-git-folder
+
+info:
+  name: Exposed .git Folder
+  author: Fabric
+  severity: high
+  description: Searches for publicly accessible .git folders.
+  tags: config,exposure,git
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.git/config"
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+
+      - type: word
+        words:
+          - "[core]"
+          - "repositoryformatversion"
+        condition: and
+# ... rest of yaml ...</code><button class="copy-button" title="Copy Code">Copy</button></pre>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div class="category-section" id="pattern-categories">
+                        <h2>Pattern Categories</h2>
+                         <p>The patterns in Fabric cover a wide range of tasks and can be broadly grouped into several functional categories:</p>
+
+                         <h3 id="analysis-patterns">Analysis Patterns</h3>
+                         <p>Patterns focused on dissecting information, evaluating claims, identifying issues, understanding structures, or extracting specific insights.</p>
+                         <div class="pattern-card" id="analyze_answers">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">15</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_answers</h3>
+                                <div class="pattern-meta"> <div>Evaluation</div> <div>Education</div> <div>Grading</div> </div>
+                                <p><strong>Purpose:</strong> Evaluate the correctness of provided answers against ideal answers, considering subject and student level.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_bill">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">22</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_bill</h3>
+                                <div class="pattern-meta"> <div>Legislation</div> <div>Analysis</div> <div>Politics</div> <div>Policy</div> </div>
+                                <p><strong>Purpose:</strong> Discern the true nature and overt/covert goals of a piece of legislative text.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_bill_short">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">10</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_bill_short</h3>
+                                <div class="pattern-meta"> <div>Legislation</div> <div>Analysis</div> <div>Politics</div> <div>Summary</div> </div>
+                                <p><strong>Purpose:</strong> Provides a highly concise summary of legislation's overt and covert goals.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_candidates">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">18</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_candidates</h3>
+                                <div class="pattern-meta"> <div>Politics</div> <div>Comparison</div> <div>Analysis</div> <div>Election</div> </div>
+                                <p><strong>Purpose:</strong> Analyze and compare the stances, policies, pros, and cons of two political candidates.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_cfp_submission">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">12</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_cfp_submission</h3>
+                                <div class="pattern-meta"> <div>Evaluation</div> <div>Conference</div> <div>Public Speaking</div> <div>Review</div> </div>
+                                <p><strong>Purpose:</strong> Review and evaluate conference speaking session submissions based on provided abstracts.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_claims">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">35</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_claims</h3>
+                                <div class="pattern-meta"> <div>Fact-Checking</div> <div>Argument Analysis</div> <div>Objectivity</div> <div>Critical Thinking</div> </div>
+                                <p><strong>Purpose:</strong> Objectively analyze truth claims, providing supporting/refuting evidence and quality ratings.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_comments">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">25</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_comments</h3>
+                                <div class="pattern-meta"> <div>Sentiment Analysis</div> <div>Social Media</div> <div>Text Analysis</div> <div>Feedback</div> </div>
+                                <p><strong>Purpose:</strong> Characterize sentiments (positive/negative/neutral), praise, and criticisms within internet comments.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_debate">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">20</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_debate</h3>
+                                <div class="pattern-meta"> <div>Debate Analysis</div> <div>Argument Analysis</div> <div>Objectivity</div> <div>Discourse</div> </div>
+                                <p><strong>Purpose:</strong> Neutrally analyze debate transcripts, identifying arguments, agreements, disagreements, and insights.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_email_headers">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">30</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_email_headers</h3>
+                                <div class="pattern-meta"> <div>Email Security</div> <div>Cybersecurity</div> <div>Technical Analysis</div> <div>Forensics</div> </div>
+                                <p><strong>Purpose:</strong> Analyze SPF, DKIM, DMARC, and ARC results from email headers for security insights.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_incident">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">40</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_incident</h3>
+                                <div class="pattern-meta"> <div>Cybersecurity</div> <div>Incident Response</div> <div>Data Extraction</div> <div>Threat Intel</div> </div>
+                                <p><strong>Purpose:</strong> Extract essential information (attack type, target, impact, CVEs, MITRE ATT&CK) from cybersecurity breach articles.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_interviewer_techniques">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">14</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_interviewer_techniques</h3>
+                                <div class="pattern-meta"> <div>Interview Analysis</div> <div>Communication</div> <div>Skills Analysis</div> </div>
+                                <p><strong>Purpose:</strong> Extract and analyze the specific questioning techniques that make interviewers effective.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_logs">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">33</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_logs</h3>
+                                <div class="pattern-meta"> <div>Log Analysis</div> <div>SRE</div> <div>System Administration</div> <div>IT Operations</div> <div>Troubleshooting</div></div>
+                                <p><strong>Purpose:</strong> Analyze server or application logs to identify patterns, anomalies, errors, and performance issues.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_malware">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">45</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_malware</h3>
+                                <div class="pattern-meta"> <div>Malware Analysis</div> <div>Cybersecurity</div> <div>Reverse Engineering</div> <div>IOC Extraction</div> </div>
+                                <p><strong>Purpose:</strong> Extract IOCs, behavior, Mitre ATT&CK techniques, and other details from malware information or reports.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_military_strategy">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">16</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_military_strategy</h3>
+                                <div class="pattern-meta"> <div>Military History</div> <div>Strategy</div> <div>Tactical Analysis</div> <div>Historical Analysis</div> </div>
+                                <p><strong>Purpose:</strong> Analyze historical battle strategies, comparing tactics, decisions, strengths, and weaknesses.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_mistakes">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">24</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_mistakes</h3>
+                                <div class="pattern-meta"> <div>Cognitive Bias</div> <div>Self-Reflection</div> <div>Decision Making</div> <div>Thinking Patterns</div> </div>
+                                <p><strong>Purpose:</strong> Analyze past mistaken thought patterns based on examples and anticipate potential current errors.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_paper">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">38</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_paper</h3>
+                                <div class="pattern-meta"> <div>Research</div> <div>Academia</div> <div>Scientific Analysis</div> <div>Evaluation</div> <div>Critical Review</div> </div>
+                                <p><strong>Purpose:</strong> Analyze research paper findings, scientific rigor, methodology transparency, quality, and potential conflicts.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_patent">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">19</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_patent</h3>
+                                <div class="pattern-meta"> <div>Patent Law</div> <div>Intellectual Property</div> <div>Technical Analysis</div> <div>Innovation</div> </div>
+                                <p><strong>Purpose:</strong> Examine patent applications for field, problem, solution, advantage, novelty, and inventiveness.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_personality">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">21</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_personality</h3>
+                                <div class="pattern-meta"> <div>Psychology</div> <div>Behavioral Analysis</div> <div>Personality Assessment</div> </div>
+                                <p><strong>Purpose:</strong> Perform an in-depth psychological analysis based on provided text or transcript input.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_presentation">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">26</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_presentation</h3>
+                                <div class="pattern-meta"> <div>Public Speaking</div> <div>Presentation Skills</div> <div>Evaluation</div> <div>Communication Analysis</div> </div>
+                                <p><strong>Purpose:</strong> Critique presentation content, speaker focus (ideas vs. self), entertainment value, and overall effectiveness.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_product_feedback">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">29</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_product_feedback</h3>
+                                <div class="pattern-meta"> <div>Product Management</div> <div>User Feedback</div> <div>Data Analysis</div> <div>Prioritization</div> </div>
+                                <p><strong>Purpose:</strong> Analyze, consolidate, score, and prioritize user feedback for products based on usefulness.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_proposition">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">17</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_proposition</h3>
+                                <div class="pattern-meta"> <div>Politics</div> <div>Legislation</div> <div>Policy Analysis</div> <div>Ballot Measure</div> </div>
+                                <p><strong>Purpose:</strong> Analyze federal, state, or local ballot propositions, detailing purpose, impact, and arguments.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_prose">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">36</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_prose</h3>
+                                <div class="pattern-meta"> <div>Writing</div> <div>Editing</div> <div>Content Analysis</div> <div>Style Guide</div> </div>
+                                <p><strong>Purpose:</strong> Evaluate writing quality based on novelty, clarity, and prose style, providing ratings and recommendations.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_prose_json">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">11</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_prose_json</h3>
+                                <div class="pattern-meta"> <div>Writing</div> <div>Editing</div> <div>Content Analysis</div> <div>JSON Output</div> </div>
+                                <p><strong>Purpose:</strong> Evaluate writing quality (novelty, clarity, prose) and output the detailed analysis as a JSON object.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_prose_pinker">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">13</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_prose_pinker</h3>
+                                <div class="pattern-meta"> <div>Writing</div> <div>Editing</div> <div>Style Analysis</div> <div>Linguistics</div> </div>
+                                <p><strong>Purpose:</strong> Assess prose quality and provide recommendations based on Steven Pinker's "The Sense of Style".</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_risk">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">23</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_risk</h3>
+                                <div class="pattern-meta"> <div>Risk Management</div> <div>Vendor Assessment</div> <div>Cybersecurity</div> <div>Compliance</div> </div>
+                                <p><strong>Purpose:</strong> Conduct risk assessment of third-party vendors based on compliance and security standards documentation.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_sales_call">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">27</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_sales_call</h3>
+                                <div class="pattern-meta"> <div>Sales</div> <div>Performance Analysis</div> <div>Communication</div> <div>Call Review</div> </div>
+                                <p><strong>Purpose:</strong> Rate sales call transcripts across performance dimensions like fundamentals and pitch alignment.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_spiritual_text">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">9</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_spiritual_text</h3>
+                                <div class="pattern-meta"> <div>Religion</div> <div>Theology</div> <div>Comparative Analysis</div> <div>Textual Analysis</div> </div>
+                                <p><strong>Purpose:</strong> Analyze claims within spiritual texts, comparing/contrasting tenets, particularly against the King James Bible.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_tech_impact">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">31</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_tech_impact</h3>
+                                <div class="pattern-meta"> <div>Technology Ethics</div> <div>Social Impact</div> <div>Sustainability</div> <div>Project Assessment</div> </div>
+                                <p><strong>Purpose:</strong> Analyze the societal impact, outcomes, ethical considerations, and sustainability of technology projects.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_threat_report">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">55</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_threat_report</h3>
+                                <div class="pattern-meta"> <div>Cybersecurity</div> <div>Threat Intelligence</div> <div>Report Analysis</div> <div>Insight Extraction</div> </div>
+                                <p><strong>Purpose:</strong> Extract surprising/insightful trends, statistics, quotes, references, and recommendations from cyber threat reports.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_threat_report_cmds">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">32</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_threat_report_cmds</h3>
+                                <div class="pattern-meta"> <div>Cybersecurity</div> <div>Command Line</div> <div>Pentesting</div> <div>Tooling</div> </div>
+                                <p><strong>Purpose:</strong> Extract specific commands and command-line arguments from cybersecurity materials for practical reuse.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="analyze_threat_report_trends">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">34</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>analyze_threat_report_trends</h3>
+                                <div class="pattern-meta"> <div>Cybersecurity</div> <div>Threat Intelligence</div> <div>Trend Analysis</div> <div>Report Summarization</div> </div>
+                                <p><strong>Purpose:</strong> Specifically extract the most surprising, insightful, and interesting trends from cybersecurity threat reports.</p>
+                            </div>
+                         </div>
+                         <div class="pattern-card" id="t_analyze_challenge_handling">
+                            <div class="voting"> <button class="upvote" title="Upvote">▲</button> <span class="vote-count">8</span> <button class="downvote" title="Downvote">▼</button> </div>
+                            <div class="pattern-main">
+                                <h3>t_analyze_challenge_handling</h3>
+                                <div class="pattern-meta"> <div>Personal Development</div> <div>Goal Tracking</div> <div>TELOS</div> <div>Self-Assessment</div> </div>
+                                <p><strong>Purpose:</strong> Analyze how well personal challenges are being addressed, based on TELOS context (requires specific personal input).</p>
+                            </div>
+                         </div>
+                         <h3 id="summarization-patterns">Summarization Patterns</h3>
+                          <p>Patterns focused on condensing information into shorter formats, extracting key points, or providing overviews.</p>
+                           <div class="category-content">
+                             <span class="tag">summarize</span>
+                              <span class="tag">summarize_micro</span>
+                              <span class="tag">create_summary</span>
+                              <span class="tag">summarize_git_diff</span>
+                              </div>
+
+                         <h3 id="extraction-patterns">Extraction Patterns</h3>
+                           <p>Patterns designed to pull specific types of information (like wisdom, insights, data points, references) from larger texts.</p>
+                            <div class="category-content">
+                             <span class="tag">extract_wisdom</span>
+                              <span class="tag">extract_insights</span>
+                              <span class="tag">extract_main_idea</span>
+                               </div>
+
+                         <h3 id="creation-patterns">Creation Patterns</h3>
+                            <p>Patterns that generate new content, such as visualizations, project plans, reports, or creative text formats.</p>
+                            <div class="category-content">
+                             <span class="tag">create_visualization</span>
+                              <span class="tag">create_mermaid_visualization</span>
+                              <span class="tag">create_keynote</span>
+                               </div>
+
+                         <h3 id="code-patterns">Code-Related Patterns</h3>
+                            <p>Patterns specifically dealing with code, including explanation, generation, debugging, or documentation.</p>
+                            <div class="category-content">
+                             <span class="tag">explain_code</span>
+                              <span class="tag">create_coding_project</span>
+                              <span class="tag">coding_master</span>
+                               </div>
+
+                         <h3 id="specialized-patterns">Specialized Patterns</h3>
+                            <p>Unique patterns for niche tasks, often combining elements of other categories or addressing specific frameworks/methodologies.</p>
+                             <div class="category-content">
+                              <span class="tag">create_threat_model</span>
+                              <span class="tag">find_logical_fallacies</span>
+                              <span class="tag">analyze_spiritual_text</span>
+                               </div>
+                    </div>
+
+                    <div class="category-section" id="pattern-combinations">
+                        <h2>Using Pattern Combinations</h2>
+                        <p>Fabric allows chaining patterns together. For example, you could first use `extract_article_wisdom` on a URL and then pipe the output to `summarize` to get a concise summary of the key insights.</p>
+                         <pre><code class="language-bash"># Example of chaining (conceptual)
+fabric -p extract_article_wisdom --url "http://example.com/article" | fabric -p summarize</code><button class="copy-button" title="Copy Code">Copy</button></pre>
+                         <p>Explore combining different patterns to create powerful custom workflows for information processing.</p>
+                    </div>
+
+                    <div class="category-section" id="contributing">
+                        <h2>Contributing to This Documentation</h2>
+                        <p>This documentation is a community effort! If you find errors, want to add examples, or improve explanations, please feel free to contribute.</p>
+                        <p>You can fork the repository, make your changes, and submit a pull request. Adding more detailed examples for each pattern card would be particularly helpful.</p>
+                        <p>Consider adding sections for other pattern categories like Summarization, Extraction, Creation, Code, and Specialized patterns.</p>
+                    </div>
+
+                    <div class="category-section" id="resources">
+                        <h2>Resources</h2>
+                        <ul>
+                            <li><a href="https://github.com/danielmiessler/fabric" target="_blank" rel="noopener noreferrer">Official Fabric Repository</a></li>
+                            <li><a href="https://danielmiessler.com/" target="_blank" rel="noopener noreferrer">Daniel Miessler's Website</a></li>
+                            <li><a href="https://github.com/danielmiessler/fabric#installation" target="_blank" rel="noopener noreferrer">Fabric Installation Guide</a></li>
+                             <li><a href="https://github.com/danielmiessler/fabric/tree/main/patterns" target="_blank" rel="noopener noreferrer">Browse Patterns on GitHub</a></li>
+                        </ul>
+                        </div>
+
+                     <div class="category-section">
+                        <h2>License</h2>
+                        <p>The Fabric tool itself is licensed under the MIT License by Daniel Miessler. This community documentation page is also made available under the MIT License.</p>
+                     </div>
+
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Created with ❤️ by the community | <a href="https://github.com/swizzcheeze/Fabric_Pattern_101_info" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>
+         <p><em>This documentation is a community project and is not officially affiliated with Daniel Miessler or the Fabric project unless otherwise stated.</em></p>
+    </footer>
+
+    <script>
+        // Apply syntax highlighting after page load
+         document.addEventListener('DOMContentLoaded', (event) => {
+             document.querySelectorAll('pre code').forEach((block) => {
+                 hljs.highlightElement(block);
+             });
+         });
+
+
+        // --- Interactivity Scripts ---
+
+        // 1. Toggle Example Visibility
+        document.querySelectorAll('.toggle-example').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-target');
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    const isExpanded = targetElement.classList.toggle('show-example');
+                    button.textContent = isExpanded ? 'Hide Example ▲' : 'Show Example ▼';
+                    button.setAttribute('aria-expanded', isExpanded); // Accessibility
+                    button.classList.toggle('expanded', isExpanded);
+                }
+            });
+             // Add aria-controls attribute for accessibility
+             const targetId = button.getAttribute('data-target');
+             button.setAttribute('aria-controls', targetId);
+             button.setAttribute('aria-expanded', 'false');
+        });
+
+        // 2. Copy Button Functionality
+        document.querySelectorAll('.copy-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const pre = button.closest('pre');
+                const code = pre.querySelector('code');
+                // Prioritize specific code content if available, else use innerText
+                const textToCopy = code.textContent || code.innerText || '';
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    // Visually indicate success for screen readers
+                    button.setAttribute('aria-label', 'Copied code');
+                    setTimeout(() => {
+                        button.textContent = 'Copy';
+                        button.classList.remove('copied');
+                        button.setAttribute('aria-label', 'Copy code');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                     button.textContent = 'Error';
+                     button.setAttribute('aria-label', 'Error copying code');
+                     setTimeout(() => {
+                        button.textContent = 'Copy';
+                        button.setAttribute('aria-label', 'Copy code');
+                    }, 2000);
+                });
+            });
+             // Add initial aria-label
+             button.setAttribute('aria-label', 'Copy code');
+        });
+
+         // 3. Smooth Scrolling & Active TOC Link Highlighting
+         const tocLinks = document.querySelectorAll('.sticky-toc a');
+         // Select H2s, H3s in categories, and pattern cards
+         const sections = document.querySelectorAll('.main-content h2[id], .main-content .category-section h3[id], .main-content .pattern-card[id]');
+
+         const observerOptions = {
+             rootMargin: "-20% 0px -70% 0px", // Prioritize items higher in the viewport
+             threshold: 0
+         };
+
+          let lastActiveLink = null;
+          let tocScrollTimeout;
+
+          const observer = new IntersectionObserver((entries) => {
+              let topmostVisibleEntry = null;
+
+              // Find the topmost visible section among the intersecting entries
+              entries.forEach(entry => {
+                  if (entry.isIntersecting) {
+                      if (!topmostVisibleEntry || entry.boundingClientRect.top < topmostVisibleEntry.boundingClientRect.top) {
+                          topmostVisibleEntry = entry;
+                      }
+                  }
+              });
+
+              if (topmostVisibleEntry) {
+                  const id = topmostVisibleEntry.target.getAttribute('id');
+                  const activeLink = document.querySelector(`.sticky-toc a[href="#${id}"]`);
+
+                  if (activeLink && activeLink !== lastActiveLink) {
+                      // Remove active class from previous link
+                      if(lastActiveLink) lastActiveLink.classList.remove('active');
+
+                      // Add active class to the new link
+                      activeLink.classList.add('active');
+                      lastActiveLink = activeLink;
+
+                      // Debounce scrolling the TOC
+                      clearTimeout(tocScrollTimeout);
+                      tocScrollTimeout = setTimeout(() => {
+                           // Scroll TOC to show active link only if it's not fully visible
+                          const toc = document.querySelector('.sticky-toc');
+                          const linkRect = activeLink.getBoundingClientRect();
+                          const tocRect = toc.getBoundingClientRect();
+
+                          if (linkRect.top < tocRect.top || linkRect.bottom > tocRect.bottom) {
+                               activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                          }
+                      }, 100); // Scroll after 100ms of inactivity
+                  }
+              } else if (!entries.some(entry => entry.isIntersecting) && lastActiveLink) {
+                   // Optional: If nothing is intersecting in the target zone, maybe remove active state
+                  // lastActiveLink.classList.remove('active');
+                  // lastActiveLink = null;
+              }
+          }, observerOptions);
+
+          sections.forEach(section => {
+              if (section) { // Ensure section exists
+                   observer.observe(section);
+              }
+          });
+
+          // Function to dynamically add TOC links
+          function addTocLinks(sectionId, cardSelector, tocParentSelector) {
+             const tocParentLi = document.querySelector(tocParentSelector);
+             if (!tocParentLi) return; // Exit if parent TOC item not found
+
+             let tocList = tocParentLi.querySelector('ul');
+             if (!tocList) { // Create ul if it doesn't exist
+                 tocList = document.createElement('ul');
+                 tocParentLi.appendChild(tocList);
+             } else {
+                 // Clear existing dynamic links if regenerating
+                 // tocList.innerHTML = ''; // Uncomment if needed
+             }
+
+             const patternCards = document.querySelectorAll(cardSelector);
+             patternCards.forEach(card => {
+                 const cardId = card.id;
+                 // Check if link already exists
+                 if (tocList.querySelector(`a[href="#${cardId}"]`)) {
+                     return; // Skip if link exists
+                 }
+                 const cardTitleElement = card.querySelector('.pattern-main h3');
+                 if (cardId && cardTitleElement) {
+                     const cardTitle = cardTitleElement.textContent;
+                     const listItem = document.createElement('li');
+                     const link = document.createElement('a');
+                     link.href = `#${cardId}`;
+                     link.textContent = cardTitle;
+                     listItem.appendChild(link);
+                     tocList.appendChild(listItem);
+                 }
+             });
+          }
+
+          // Add Analysis pattern links to TOC dynamically on load
+          document.addEventListener('DOMContentLoaded', () => {
+               addTocLinks('analysis-patterns', '#analysis-patterns + .pattern-card, #analysis-patterns ~ .pattern-card', '.sticky-toc a[href="#analysis-patterns"]');
+               // Example for adding other sections:
+               // addTocLinks('writing-patterns', '#writing-patterns + .pattern-card, #writing-patterns ~ .pattern-card', '.sticky-toc a[href="#writing-patterns"]');
+               // addTocLinks('summarization-patterns', '#summarization-patterns + .pattern-card, #summarization-patterns ~ .pattern-card', '.sticky-toc a[href="#summarization-patterns"]');
+               // etc.
+               // Re-select TOC links after dynamic addition
+                tocLinks = document.querySelectorAll('.sticky-toc a');
+                // Re-observe sections if needed, though initial observe should cover added cards
+          });
+
+    </script>
+</body>
+</html>
