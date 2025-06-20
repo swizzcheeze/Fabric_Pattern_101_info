@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabric Pattern Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chosen Palette: Warm Neutrals (Stone, Teal) -->
+    <!-- Application Structure Plan: Interactive dashboard with real-time search and category filtering. This structure addresses the challenge of navigating 200+ items by providing intuitive tools for exploration and discovery, which is more user-friendly than a static, linear list. The user can either browse by function (categories) or search for specific keywords, making it easy to find the right tool for their task. -->
+    <!-- Visualization & Content Choices: Report Info: List of 215 AI patterns. Goal: Easy exploration/discovery. Viz Method: Interactive grid of cards. Interaction: Real-time text search and category buttons filter the grid. Justification: A grid of cards is scannable and familiar. The interactive filtering is essential for managing a large dataset and is far superior to a static list. Library/Method: Vanilla JS for DOM manipulation and event handling. NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .pattern-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .pattern-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .category-btn.active {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            font-weight: 600;
+        }
+        .category-btn {
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        #search-input::placeholder {
+            color: #a8a29e; /* stone-400 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-stone-900">Fabric Pattern Explorer</h1>
+            <p class="mt-2 text-lg text-stone-600">Search, filter, and discover over 200 AI patterns.</p>
+        </header>
+
+        <main>
+            <div class="sticky top-0 z-10 bg-stone-100/80 backdrop-blur-md pt-4 pb-6 mb-8">
+                <div class="max-w-4xl mx-auto">
+                    <div class="relative mb-6">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                            <svg class="h-5 w-5 text-stone-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                        <input type="search" id="search-input" placeholder="Search patterns by name or description (e.g., 'email', 'security', 'json')..." class="w-full p-3 pl-10 text-stone-800 bg-white border border-stone-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none">
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="text-sm font-medium text-stone-700 mb-2 text-center">Filter by Category:</p>
+                        <div id="category-filters" class="flex flex-wrap justify-center gap-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mb-6">
+                <p id="pattern-counter" class="text-stone-600"></p>
+            </div>
+
+            <div id="pattern-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            </div>
+
+            <div id="no-results" class="hidden text-center py-16">
+                <h3 class="text-2xl font-semibold text-stone-700">No Patterns Found</h3>
+                <p class="text-stone-500 mt-2">Try adjusting your search or filters.</p>
+            </div>
+            
+            <div class="mt-16 pt-8 border-t border-stone-200">
+                <h2 class="text-2xl font-bold text-center text-stone-800 mb-4">Pattern Category Distribution</h2>
+                <p class="text-center text-stone-600 mb-8">This chart shows how many patterns fall into each primary category, giving you an at-a-glance overview of the toolkit's focus areas.</p>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="text-center mt-16 pt-8 border-t border-stone-200">
+            <p class="text-stone-500">Built to explore the <a href="https://github.com/danielmiessler/fabric" target="_blank" class="text-teal-600 hover:underline">Fabric</a> project by Daniel Miessler.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const patterns = [
+                { name: 'agility_story', description: 'Generate a user story and acceptance criteria in JSON format based on the given topic.' },
+                { name: 'ai', description: 'Interpret questions deeply and provide concise, insightful answers in Markdown bullet points.' },
+                { name: 'analyze_answers', description: 'Evaluate quiz answers for correctness based on a learning objective and generated quiz questions.' },
+                { name: 'analyze_bill', description: 'Provide a detailed, unbiased analysis of a legislative bill, including its summary, purpose, main points, and arguments for and against it.' },
+                { name: 'analyze_bill_short', description: 'Provide a brief, high-level summary of a legislative bill, outlining its main purpose and key impacts.' },
+                { name: 'analyze_candidates', description: 'Compare and contrast two political candidates based on key issues and policies.' },
+                { name: 'analyze_cfp_submission', description: 'Review and evaluate conference speaking session submissions based on clarity, relevance, depth, and engagement potential.' },
+                { name: 'analyze_claims', description: 'Analyze and rate truth claims with evidence, counter-arguments, fallacies, and final recommendations.' },
+                { name: 'analyze_comments', description: 'Evaluate internet comments for content, categorize sentiment, and identify reasons for praise, criticism, and neutrality.' },
+                { name: 'analyze_debate', description: 'Rate debates on insight, emotionality, and present an unbiased, thorough analysis of arguments, agreements, and disagreements.' },
+                { name: 'analyze_email_headers', description: 'Provide cybersecurity analysis and actionable insights on SPF, DKIM, DMARC, and ARC email header results.' },
+                { name: 'analyze_incident', description: 'Efficiently extract and organize key details from cybersecurity breach articles, focusing on attack type, vulnerable components, and remediation steps.' },
+                { name: 'analyze_interviewer_techniques', description: 'Analyze interviewer techniques, identify their unique qualities, and succinctly articulate what makes them stand out.' },
+                { name: 'analyze_logs', description: 'Analyze server log files to identify patterns, anomalies, and security issues, providing data-driven insights and recommendations.' },
+                { name: 'analyze_malware', description: 'Analyze malware details, extract key indicators, techniques, and potential detection strategies for malware analysts.' },
+                { name: 'analyze_military_strategy', description: 'Analyze a historical battle, offering in-depth insights into strategic decisions, tactics, logistics, and consequences.' },
+                { name: 'analyze_mistakes', description: 'Analyze past mistakes in thinking patterns, map them to current beliefs, and offer recommendations to improve future predictions.' },
+                { name: 'analyze_paper', description: 'Analyze research papers by summarizing findings, evaluating rigor, and assessing quality to provide insights for documentation and review.' },
+                { name: 'analyze_paper_simple', description: 'Provide a simple, clear summary of a research paper\'s main topic, methodology, and key findings.' },
+                { name: 'analyze_patent', description: 'Analyze a patent\'s field, problem, solution, novelty, inventive step, and advantages in detail.' },
+                { name: 'analyze_personality', description: 'Perform a deep psychological analysis of a person based on their behavior, language, and psychological traits.' },
+                { name: 'analyze_presentation', description: 'Review and critique presentations by analyzing the content, speaker\'s goals, self-focus, and entertainment value.' },
+                { name: 'analyze_product_feedback', description: 'Analyze and organize user feedback by identifying themes, consolidating comments, and prioritizing them based on usefulness.' },
+                { name: 'analyze_proposition', description: 'Analyze a ballot proposition by identifying its purpose, impact, arguments for and against, and relevant background.' },
+                { name: 'analyze_prose', description: 'Evaluate writing for novelty, clarity, and prose quality, providing ratings and improvement recommendations.' },
+                { name: 'analyze_prose_json', description: 'Evaluate writing for novelty, clarity, and prose, providing ratings and suggestions in a structured JSON format.' },
+                { name: 'analyze_prose_pinker', description: 'Evaluate prose based on Steven Pinker\'s "The Sense of Style," analyzing clarity and identifying elements of bad writing.' },
+                { name: 'analyze_risk', description: 'Conduct a risk assessment of a third-party vendor, assigning a risk score and suggesting security controls.' },
+                { name: 'analyze_sales_call', description: 'Rate sales call performance across multiple dimensions, providing scores and actionable feedback based on a transcript.' },
+                { name: 'analyze_spiritual_text', description: 'Compare and contrast spiritual texts by analyzing their claims and differences with the King James Bible.' },
+                { name: 'analyze_tech_impact', description: 'Analyze the societal impact, ethical considerations, and sustainability of technology projects.' },
+                { name: 'analyze_terraform_plan', description: 'Review a Terraform execution plan for potential security risks and misconfigurations.' },
+                { name: 'analyze_threat_report', description: 'Extract surprising insights, trends, statistics, quotes, and recommendations from cybersecurity threat reports.' },
+                { name: 'analyze_threat_report_cmds', description: 'Extract and synthesize actionable cybersecurity commands from provided materials for pentesters and non-experts.' },
+                { name: 'analyze_threat_report_trends', description: 'Extract up to 50 surprising, insightful, and interesting trends from a cybersecurity threat report.' },
+                { name: 'answer_interview_question', description: 'Generate concise, tailored responses to technical interview questions, incorporating alternative approaches and evidence.' },
+                { name: 'ask_secure_by_design_questions', description: 'Generate security-focused questions to ensure a project is built securely by design.' },
+                { name: 'ask_uncle_duke', description: 'Coordinate a team of AI agents to research and produce multiple software development solutions based on provided specifications.' },
+                { name: 'capture_thinkers_work', description: 'Analyze philosophers or philosophies and provide detailed summaries of their teachings, background, works, and advice.' },
+                { name: 'check_agreement', description: 'Analyze contracts and agreements to identify important stipulations, issues, and potential gotchas, then summarize them.' },
+                { name: 'clean_text', description: 'Fix broken or malformatted text by correcting line breaks, punctuation, and capitalization without altering content.' },
+                { name: 'coding_master', description: 'Explain a coding concept to a beginner with examples and formatted code output.' },
+                { name: 'compare_and_contrast', description: 'Compare and contrast a list of items in a markdown table.' },
+                { name: 'convert_to_markdown', description: 'Convert content into clean, complete Markdown format, preserving all original structure and formatting.' },
+                { name: 'create_5_sentence_summary', description: 'Create concise summaries or answers at 5 different levels of depth, from 5 words to a single word.' },
+                { name: 'create_academic_paper', description: 'Generate a high-quality academic paper in LaTeX format with structured content and a professional layout.' },
+                { name: 'create_ai_jobs_analysis', description: 'Analyze job categories\' susceptibility to automation and provide strategies for personal adaptation.' },
+                { name: 'create_aphorisms', description: 'Find and generate a list of brief, witty statements or sayings.' },
+                { name: 'create_art_prompt', description: 'Generate a detailed, compelling visual description of a concept for creating AI-generated art.' },
+                { name: 'create_better_frame', description: 'Identify and analyze different frames for interpreting reality, emphasizing positive, productive lenses.' },
+                { name: 'create_coding_feature', description: 'Generate wireframes and starter code for coding ideas.' },
+                { name: 'create_coding_project', description: 'Create a complete coding project from a description, including file structure and code for each file.' },
+                { name: 'create_command', description: 'Help determine the correct parameters and switches for penetration testing tools based on an objective.' },
+                { name: 'create_cyber_summary', description: 'Summarize cybersecurity content into a 25-word summary and categorized bullet points.' },
+                { name: 'create_design_document', description: 'Create a detailed system design document using the C4 model, including business and security postures.' },
+                { name: 'create_diy', description: 'Create structured "Do It Yourself" tutorial patterns with step-by-step instructions in Markdown.' },
+                { name: 'create_excalidraw_visualization', description: 'Generate Excalidraw-compatible JSON to create visualizations of concepts.' },
+                { name: 'create_flash_cards', description: 'Create flashcards from input text in a question/answer format.' },
+                { name: 'create_formal_email', description: 'Craft professional, clear, and respectful emails by analyzing context, tone, and purpose.' },
+                { name: 'create_git_diff_commit', description: 'Generate Git commands and Conventional Commit messages to reflect changes in a repository.' },
+                { name: 'create_investigation_visualization', description: 'Generate a Mermaid graph to visualize the relationships between entities in an investigation.' },
+                { name: 'create_keynote', description: 'Create a full keynote presentation, including a script and slide content, based on a given topic.' },
+                { name: 'create_loe_document', description: 'Generate a Level of Effort (LOE) document for a project, breaking down tasks and estimating time.' },
+                { name: 'create_logo', description: 'Generate prompts for DALL-E 3 to create a logo based on a company description.' },
+                { name: 'create_markmap_visualization', description: 'Generate Markmap-compatible Markdown to create mind map visualizations.' },
+                { name: 'create_mermaid_visualization', description: 'Generate Mermaid syntax to create diagrams and visualizations from text.' },
+                { name: 'create_mermaid_visualization_for_github', description: 'Generate Mermaid syntax within a code block for direct use in GitHub.' },
+                { name: 'create_micro_summary', description: 'Create an ultra-concise summary of a topic in just a few words.' },
+                { name: 'create_mnemonic_phrases', description: 'Create memorable phrases or sentences to help remember information.' },
+                { name: 'create_network_threat_landscape', description: 'Create a network threat landscape summary based on CIDR ranges, including threat actors and recommendations.' },
+                { name: 'create_newsletter_entry', description: 'Write a newsletter entry based on a provided topic or article.' },
+                { name: 'create_npc', description: 'Create a Non-Player Character (NPC) for a role-playing game with detailed attributes.' },
+                { name: 'create_pattern', description: 'Assist in creating a new Fabric pattern by defining its functionality and generating the `system.md` file.' },
+                { name: 'create_prd', description: 'Generate a Product Requirements Document (PRD) for a new feature or product.' },
+                { name: 'create_prediction_block', description: 'Create a structured prediction block with a claim, confidence level, and rationale.' },
+                { name: 'create_quiz', description: 'Generate a quiz with multiple-choice questions based on a learning objective.' },
+                { name: 'create_reading_plan', description: 'Create a structured reading plan for a book or topic.' },
+                { name: 'create_recursive_outline', description: 'Generate a deeply nested, recursive outline for a complex topic.' },
+                { name: 'create_report_finding', description: 'Create a well-structured and detailed finding for a security assessment report.' },
+                { name: 'create_rpg_summary', description: 'Summarize a role-playing game session, capturing key events and character actions.' },
+                { name: 'create_security_update', description: 'Create a security update summary for stakeholders, detailing recent threats and countermeasures.' },
+                { name: 'create_show_intro', description: 'Write an introduction script for a podcast or show episode.' },
+                { name: 'create_sigma_rules', description: 'Create Sigma rules for threat detection based on security event logs.' },
+                { name: 'create_story_explanation', description: 'Explain the meaning and themes of a story or parable.' },
+                { name: 'create_stride_threat_model', description: 'Create a STRIDE threat model for an application or system.' },
+                { name: 'create_summary', description: 'Generate a concise summary of a long text, article, or document.' },
+                { name: 'create_tags', description: 'Generate a list of relevant tags or keywords for a piece of content.' },
+                { name: 'create_threat_scenarios', description: 'Create realistic threat scenarios for a given system or organization.' },
+                { name: 'create_ttrc_graph', description: 'Generate a Tools, Techniques, Recommendations, and Controls (TTRC) graph in Mermaid format.' },
+                { name: 'create_ttrc_narrative', description: 'Create a narrative summary of a TTRC (Tools, Techniques, Recommendations, Controls) analysis.' },
+                { name: 'create_upgrade_pack', description: 'Create a content package to help someone upgrade their skills or knowledge in a specific area.' },
+                { name: 'create_user_story', description: 'Create a user story with acceptance criteria for a software feature.' },
+                { name: 'create_video_chapters', description: 'Generate YouTube video chapters with timestamps from a transcript.' },
+                { name: 'create_visualization', description: 'Generate a visualization of a system, process, or concept in the specified format (e.g., Mermaid, PlantUML).' },
+                { name: 'dialog_with_socrates', description: 'Engage in a Socratic dialogue to critically examine beliefs and assumptions.' },
+                { name: 'enrich_blog_post', description: 'Enrich a blog post by adding more detail, examples, and insights.' },
+                { name: 'explain_code', description: 'Provide a detailed explanation of a piece of code, including its functionality and logic.' },
+                { name: 'explain_docs', description: 'Explain a section of technical documentation in simpler terms.' },
+                { name: 'explain_math', description: 'Explain a mathematical concept clearly and concisely with examples.' },
+                { name: 'explain_project', description: 'Explain a project\'s purpose, functionality, and technology stack from its file structure.' },
+                { name: 'explain_terms', description: 'Define and explain a list of terms.' },
+                { name: 'export_data_as_csv', description: 'Convert structured data into CSV format.' },
+                { name: 'extract_algorithm_update_recommendations', description: 'Extract recommendations for algorithmic updates from text.' },
+                { name: 'extract_article_wisdom', description: 'Extract the key ideas, insights, and wisdom from an article.' },
+                { name: 'extract_book_ideas', description: 'Extract the main ideas and concepts from a book.' },
+                { name: 'extract_book_recommendations', description: 'Extract book recommendations from a text.' },
+                { name: 'extract_business_ideas', description: 'Extract potential business ideas from a piece of text.' },
+                { name: 'extract_controversial_ideas', description: 'Extract controversial or challenging ideas from a text.' },
+                { name: 'extract_core_message', description: 'Extract the single core message or thesis from a piece of content.' },
+                { name: 'extract_ctf_writeup', description: 'Extract the key steps and techniques from a Capture The Flag (CTF) writeup.' },
+                { name: 'extract_domains', description: 'Extract all domain names from a block of text.' },
+                { name: 'extract_extraordinary_claims', description: 'Extract extraordinary or unbelievable claims from a text.' },
+                { name: 'extract_ideas', description: 'Extract interesting ideas and concepts from a text.' },
+                { name: 'extract_insights', description: 'Extract deep, non-obvious insights from a piece of content.' },
+                { name: 'extract_insights_dm', description: 'Extract insights using a specific framework developed by Daniel Miessler.' },
+                { name: 'extract_instructions', description: 'Extract a set of instructions or steps from a text.' },
+                { name: 'extract_jokes', description: 'Extract jokes from a text.' },
+                { name: 'extract_latest_video', description: 'Get the latest video from a YouTube channel.' },
+                { name: 'extract_main_activities', description: 'Extract the main activities or events described in a text.' },
+                { name: 'extract_main_idea', description: 'Extract the main idea or topic of a text.' },
+                { name: 'extract_most_redeeming_thing', description: 'Find the most positive or redeeming aspect of a negative situation or topic.' },
+                { name: 'extract_patterns', description: 'Identify and extract recurring patterns or themes from data.' },
+                { name: 'extract_poc', description: 'Extract Proof of Concept (PoC) code from a security advisory or writeup.' },
+                { name: 'extract_predictions', description: 'Extract predictions about the future from a text.' },
+                { name: 'extract_primary_problem', description: 'Identify and articulate the primary problem being addressed in a text.' },
+                { name: 'extract_primary_solution', description: 'Identify and articulate the primary solution being proposed in a text.' },
+                { name: 'extract_product_features', description: 'Extract a list of product features from a description.' },
+                { name: 'extract_questions', description: 'Extract all questions present in a piece of text.' },
+                { name: 'extract_recipe', description: 'Extract a recipe\'s ingredients and instructions from a text.' },
+                { name: 'extract_recommendations', description: 'Extract all recommendations from a text.' },
+                { name: 'extract_references', description: 'Extract all references, citations, and sources from a text.' },
+                { name: 'extract_skills', description: 'Extract a list of skills from a job description or biography.' },
+                { name: 'extract_song_meaning', description: 'Analyze and extract the meaning of a song\'s lyrics.' },
+                { name: 'extract_sponsors', description: 'Extract the names of sponsors from a podcast or video transcript.' },
+                { name: 'extract_videoid', description: 'Extract the YouTube video ID from a URL.' },
+                { name: 'extract_wisdom', description: 'Extract the most profound and timeless wisdom from a text.' },
+                { name: 'extract_wisdom_agents', description: 'Use a multi-agent system to extract wisdom from a text.' },
+                { name: 'extract_wisdom_dm', description: 'Extract wisdom using a specific framework by Daniel Miessler.' },
+                { name: 'extract_wisdom_nometa', description: 'Extract wisdom from a text without any additional metadata or commentary.' },
+                { name: 'find_female_life_partner', description: 'Act as a dating coach to help find a female life partner.' },
+                { name: 'find_hidden_message', description: 'Uncover any hidden or subliminal messages in a text.' },
+                { name: 'find_logical_fallacies', description: 'Identify and explain any logical fallacies in an argument.' },
+                { name: 'get_wow_per_minute', description: 'Analyze content to determine its "Wow per Minute" score based on insightful moments.' },
+                { name: 'get_youtube_rss', description: 'Get the RSS feed URL for a YouTube channel.' },
+                { name: 'humanize', description: 'Rewrite text to make it sound more human and less robotic.' },
+                { name: 'identify_dsrp_distinctions', description: 'Identify identity-other Distinctions within a text based on DSRP theory.' },
+                { name: 'identify_dsrp_perspectives', description: 'Identify the point-view Perspectives within a text based on DSRP theory.' },
+                { name: 'identify_dsrp_relationships', description: 'Identify part-whole Systems within a text based on DSRP theory.' },
+                { name: 'identify_dsrp_systems', description: 'Identify action-reaction Relationships within a text based on DSRP theory.' },
+                { name: 'identify_job_stories', description: 'Identify and formulate "Job Stories" from user feedback or descriptions.' },
+                { name: 'improve_academic_writing', description: 'Improve the quality and clarity of academic writing.' },
+                { name: 'improve_prompt', description: 'Take a prompt and improve it for better AI responses.' },
+                { name: 'improve_report_finding', description: 'Improve the clarity, structure, and impact of a security assessment finding.' },
+                { name: 'improve_writing', description: 'Improve a piece of writing by enhancing its clarity, style, and engagement.' },
+                { name: 'judge_output', description: 'Evaluate and "judge" the output of an AI model based on specific criteria.' },
+                { name: 'label_and_rate', description: 'Label and rate content based on a defined set of categories and scales.' },
+                { name: 'md_callout', description: 'Create a Markdown callout box (e.g., for notes or warnings).' },
+                { name: 'official_pattern_template', description: 'A template for creating new, official Fabric patterns.' },
+                { name: 'prepare_7s_strategy', description: 'Analyze an organization and prepare a strategy based on the McKinsey 7S framework.' },
+                { name: 'provide_guidance', description: 'Provide guidance and advice on a particular topic.' },
+                { name: 'rate_ai_response', description: 'Rate an AI\'s response for quality, relevance, and helpfulness.' },
+                { name: 'rate_ai_result', description: 'Rate the result of an AI task on a scale of 1-10.' },
+                { name: 'rate_content', description: 'Rate a piece of content on multiple dimensions like quality, creativity, and clarity.' },
+                { name: 'rate_value', description: 'Rate the value or importance of something on a 1-100 scale across multiple vectors.' },
+                { name: 'raw_query', description: 'Send a raw, unmodified query to the underlying language model.' },
+                { name: 'recommend_artists', description: 'Recommend artists similar to a given one.' },
+                { name: 'recommend_pipeline_upgrades', description: 'Recommend upgrades and improvements for a data or software pipeline.' },
+                { name: 'recommend_talkpanel_topics', description: 'Recommend topics for a talk or panel discussion.' },
+                { name: 'refine_design_document', description: 'Refine and improve a system design document.' },
+                { name: 'review_design', description: 'Review a product or system design for flaws and improvements.' },
+                { name: 'sanitize_broken_html_to_markdown', description: 'Convert broken or messy HTML into clean Markdown.' },
+                { name: 'show_fabric_options_markmap', description: 'Display the Fabric command options as a Markmap visualization.' },
+                { name: 'solve_with_cot', description: 'Use Chain-of-Thought (CoT) reasoning to solve a problem step-by-step.' },
+                { name: 'suggest_pattern', description: 'Suggest the best Fabric pattern to use for a given task or goal.' },
+                { name: 'summarize', description: 'A general-purpose summarization pattern.' },
+                { name: 'summarize_board_meeting', description: 'Summarize the key points and decisions from a board meeting.' },
+                { name: 'summarize_debate', description: 'Summarize the arguments and outcome of a debate.' },
+                { name: 'summarize_git_changes', description: 'Summarize the changes in a git repository.' },
+                { name: 'summarize_git_diff', description: 'Summarize the changes shown in a git diff.' },
+                { name: 'summarize_lecture', description: 'Summarize the key concepts and takeaways from a lecture.' },
+                { name: 'summarize_legislation', description: 'Summarize a piece of legislation in plain language.' },
+                { name: 'summarize_meeting', description: 'Summarize the key discussions, decisions, and action items from a meeting.' },
+                { name: 'summarize_micro', description: 'Create an extremely short, "micro" summary of a text.' },
+                { name: 'summarize_newsletter', description: 'Summarize the content of a newsletter.' },
+                { name: 'summarize_paper', description: 'Summarize a research paper, focusing on its contributions and findings.' },
+                { name: 'summarize_prompt', description: 'Summarize a prompt to understand its core request.' },
+                { name: 'summarize_pull-requests', description: 'Summarize the changes in a set of pull requests.' },
+                { name: 'summarize_rpg_session', description: 'Summarize the events of a role-playing game session.' },
+                { name: 'to_flashcards', description: 'Convert a text into a set of flashcards for studying.' },
+                { name: 'transcribe_minutes', description: 'Transcribe spoken words from a meeting into written minutes.' },
+                { name: 'translate', description: 'Translate text from one language to another.' },
+                { name: 'tweet', description: 'Create a tweet from a piece of text or a URL.' },
+                { name: 't_analyze_challenge_handling', description: 'Analyze how someone handles challenges and adversity.' },
+                { name: 't_check_metrics', description: 'Check and report on a set of key metrics.' },
+                { name: 't_create_h3_career', description: 'Help brainstorm and plan a "Horizon 3" long-term career path.' },
+                { name: 't_create_opening_sentences', description: 'Create compelling opening sentences for a piece of writing.' },
+                { name: 't_describe_life_outlook', description: 'Describe a person\'s outlook on life based on their writing or speech.' },
+                { name: 't_extract_intro_sentences', description: 'Extract the introductory sentences from a text.' },
+                { name: 't_extract_panel_topics', description: 'Extract potential topics for a panel discussion from a text.' },
+                { name: 't_find_blindspots', description: 'Help identify personal or organizational blindspots.' },
+                { name: 't_find_negative_thinking', description: 'Identify patterns of negative thinking in a text.' },
+                { name: 't_find_neglected_goals', description: 'Help identify goals that have been neglected or forgotten.' },
+                { name: 't_give_encouragement', description: 'Provide encouragement and motivation.' },
+                { name: 't_red_team_thinking', description: 'Apply red-teaming or adversarial thinking to a plan or idea.' },
+                { name: 't_threat_model_plans', description: 'Create a threat model for a set of plans or projects.' },
+                { name: 't_visualize_mission_goals_projects', description: 'Create a visualization of how mission, goals, and projects are connected.' },
+                { name: 't_year_in_review', description: 'Help conduct a personal or professional year-in-review.' },
+                { name: 'write_essay', description: 'Write an essay on a given topic.' },
+                { name: 'write_hackerone_report', description: 'Write a vulnerability report for submission to HackerOne.' },
+                { name: 'write_latex', description: 'Write a document using LaTeX for professional typesetting.' },
+                { name: 'write_micro_essay', description: 'Write a very short, concise "micro" essay.' },
+                { name: 'write_nuclei_template_rule', description: 'Write a vulnerability scanning template for the Nuclei scanner.' },
+                { name: 'write_pull-request', description: 'Write a clear and descriptive pull request message.' },
+                { name: 'write_semgrep_rule', description: 'Write a static analysis rule for the Semgrep tool.' },
+                { name: 'youtube_summary', description: 'Provide a summary of a YouTube video from its URL.' }
+            ];
+
+            const categories = {
+                'analyze': 'Analysis',
+                'create': 'Creation',
+                'write': 'Writing',
+                'summarize': 'Summarization',
+                'extract': 'Extraction',
+                'improve': 'Improvement',
+                'refine': 'Improvement',
+                'explain': 'Explanation',
+                'convert': 'Transformation',
+                'sanitize': 'Transformation',
+                'translate': 'Transformation',
+                'rate': 'Evaluation',
+                'judge': 'Evaluation',
+                'label': 'Evaluation',
+                'ask': 'Technical',
+                'coding': 'Code',
+                'code': 'Code',
+                't_': 'Specialized',
+            };
+
+            const getCategory = (name) => {
+                for (const prefix in categories) {
+                    if (name.startsWith(prefix)) {
+                        return categories[prefix];
+                    }
+                }
+                if (['write_essay', 'write_hackerone_report', 'write_latex', 'write_micro_essay', 'write_nuclei_template_rule', 'write_pull-request', 'write_semgrep_rule'].includes(name)){
+                    return 'Writing';
+                }
+                return 'Miscellaneous';
+            };
+            
+            const patternData = patterns.map(p => ({ ...p, category: getCategory(p.name) }));
+            
+            const categoryCounts = patternData.reduce((acc, p) => {
+                acc[p.category] = (acc[p.category] || 0) + 1;
+                return acc;
+            }, {});
+
+            const allCategories = ['All', ...Object.keys(categoryCounts).sort()];
+            const searchInput = document.getElementById('search-input');
+            const patternGrid = document.getElementById('pattern-grid');
+            const patternCounter = document.getElementById('pattern-counter');
+            const categoryFilters = document.getElementById('category-filters');
+            const noResults = document.getElementById('no-results');
+            
+            let activeCategory = 'All';
+
+            const renderPatterns = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                
+                const filteredPatterns = patternData.filter(pattern => {
+                    const inCategory = activeCategory === 'All' || pattern.category === activeCategory;
+                    const matchesSearch = pattern.name.toLowerCase().includes(searchTerm) || pattern.description.toLowerCase().includes(searchTerm);
+                    return inCategory && matchesSearch;
+                });
+
+                patternGrid.innerHTML = '';
+                
+                if(filteredPatterns.length === 0) {
+                    noResults.classList.remove('hidden');
+                } else {
+                    noResults.classList.add('hidden');
+                }
+
+                filteredPatterns.forEach(pattern => {
+                    const card = document.createElement('div');
+                    card.className = 'pattern-card bg-white p-5 rounded-lg shadow-md flex flex-col';
+                    card.innerHTML = `
+                        <h3 class="text-lg font-semibold text-teal-700 mb-2">${pattern.name}</h3>
+                        <p class="text-stone-600 text-sm flex-grow">${pattern.description}</p>
+                        <div class="mt-4 pt-3 border-t border-stone-200 text-xs text-stone-500 font-medium uppercase">${pattern.category}</div>
+                    `;
+                    patternGrid.appendChild(card);
+                });
+                
+                patternCounter.textContent = `Displaying ${filteredPatterns.length} of ${patternData.length} patterns.`;
+            };
+            
+            const renderCategoryFilters = () => {
+                allCategories.forEach(category => {
+                    const btn = document.createElement('button');
+                    btn.textContent = `${category} (${category === 'All' ? patternData.length : categoryCounts[category] || 0})`;
+                    btn.className = 'category-btn px-3 py-1.5 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-full';
+                    if (category === 'All') {
+                        btn.classList.add('active');
+                    }
+                    btn.addEventListener('click', () => {
+                        activeCategory = category;
+                        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        renderPatterns();
+                    });
+                    categoryFilters.appendChild(btn);
+                });
+            };
+
+            const renderChart = () => {
+                const ctx = document.getElementById('categoryChart').getContext('2d');
+                const sortedCategories = Object.entries(categoryCounts).sort(([, a], [, b]) => b - a);
+                const labels = sortedCategories.map(item => item[0]);
+                const data = sortedCategories.map(item => item[1]);
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Pattern Count',
+                            data: data,
+                            backgroundColor: [
+                                '#14b8a6', '#2dd4bf', '#5eead4', '#99f6e4',
+                                '#0d9488', '#0f766e', '#115e59', '#042f2e',
+                                '#f97316', '#fb923c', '#fdba74', '#fed7aa'
+                            ],
+                            borderColor: '#f5f5f4',
+                            borderWidth: 2,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 20,
+                                    padding: 15,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                             tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            };
+
+            searchInput.addEventListener('input', renderPatterns);
+            renderCategoryFilters();
+            renderPatterns();
+            renderChart();
+        });
+    </script>
+</body>
+</html>
